@@ -16,7 +16,7 @@
       //var searchParams = new URLSearchParams(window.location.search);
       //var address = searchParams.get('addressOne');
 
-      
+      //file:///C:/Users/sean/Downloads/GoogleMap.html?&title1=Smith, John&address1=3640 Hepburn ST SE LACEY, WA&service1=Pack&title2=Doe, Jane &address2=11417 94TH AVE CT SW LAKEWOOD, WA& service2=Pack&
       //Load queries from URL using regular expressions.
       function getParameterByName(name, url) {
         if (!url) url = window.location.href;
@@ -28,13 +28,39 @@
         return decodeURIComponent(results[2].replace(/\+/g, " "));
       }
 
+      var geocoder = new google.maps.Geocoder();
+      var marker, i;
+      
+       function codeAddress(address, name, description){
+        geocoder.geocode( {'address': address}, function(results, status){
+          if(status == google.maps.GeocoderStatus.OK){
+            //console.log(results[0].geometry.location);
+            var htmlDescription = "";
+            if(description){
+              htmlDescription = name + "<br class = 'center'>" + description;
+            } else {
+              htmlDescription = name;
+            }
+              var marker = new google.maps.Marker({
+                     position: results[0].geometry.location,
+                     map: map,
+                     title: htmlDescription
+                     });
+              marker.info = new google.maps.InfoWindow({content:marker.title});
+              google.maps.event.addListener(marker, 'click', function(){
+            marker.info.open(map, marker);
+        });
+        return marker;
+            }
+          }
+        )
+      }
+
       //Find the number of parameters in the URL
       var url = window.location.href;
       var splitAtEqualSign = url.split('=');
-      //Have to drop one from the count in order to account for the base url
-      var parameterCount = splitAtEqualSign.length - 1;
-      console.log(parameterCount);
-
+      //Have to drop one from the count in order to account for the base url then divide by three for number of different parameters
+      var parameterCount = (splitAtEqualSign.length - 1)/3;   
 
       //Create Map
       var map = new google.maps.Map(document.getElementById('map'), {
@@ -43,28 +69,14 @@
         mapTypeId: google.maps.MapTypeId.ROADMAP
       });
 
-      //Convert addresses to lat/long then create Markers and add to map
-      var infowindow = new google.maps.InfoWindow();
-      var marker, i;
-      var geocoder = new google.maps.Geocoder();
-
+      //Cycle through locations and process
       for (addressLocation = 1; addressLocation <= parameterCount ; addressLocation++){
         var address = getParameterByName('address' + addressLocation);
-        geocoder.geocode( { 'address':address}, function(results, status) {
-          if (status == google.maps.GeocoderStatus.OK){
-            var marker = new google.maps.Marker({
-              map: map,
-              position: results[0].geometry.location
-            })
-            google.maps.event.addListener(marker, 'click', (function(marker, i) {
-            return function() {
-              infowindow.setContent('Mark Content Here');
-              infowindow.open(map, marker);
-            }
-          })(marker, i));
-        }
-        });
+        var name = getParameterByName('title' + addressLocation);
+        var description = getParameterByName('service' + addressLocation);
+        var latLong = codeAddress(address, name, description);
       }
+     
     </script>
 </body>
 </html>
