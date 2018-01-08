@@ -6,4 +6,4 @@ Our company is using a Filemaker Pro database.  Filemaker has a built in web bro
 I built this Javascript program to run locally in order to parse the url into addresses, turn those addresses into Long/Lat and then plot them on a map. Then the script opens the file file:///C:/Users/sean/Downloads/GoogleMap.html?address1="AddressListedHere" and replaces the "AddressListedHere" with the appropriate address.
 
 # Future Plans
-This method does not allow me to embed service descriptions as the tag headers. I would also like to color code the markers based on the service description to correspond to what I have on file.
+Still working on figuring out how to format the InfoWindow function. 
